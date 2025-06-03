@@ -3,5 +3,6 @@
     username TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     mfa_secret TEXT NOT NULL,
-    gendate TIMESTAMP NOT NULL
+    gendate TIMESTAMP NOT NULL,
+    expired BOOLEAN NOT NULL DEFAULT FALSE
 );
