@@ -1,0 +1,15 @@
+﻿version: "3.8"
+
+services:
+  frontend:
+    image: nginx:alpine
+    container_name: frontend_mspr
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    ports:
+      - "8081:80"
+    networks:
+      - backend
+networks:
+  backend:
+    driver: bridge
