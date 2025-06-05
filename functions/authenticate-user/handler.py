@@ -4,16 +4,31 @@ import psycopg2
 import bcrypt
 import pyotp
 from datetime import datetime, timedelta
+from flask import Flask, request, jsonify, make_response
 
-def handle(req):
+app = Flask(__name__)
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers.add("Access-Control-Allow-Origin", "http://localhost:8081")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "POST,OPTIONS")
+    return response
+
+@app.route("/", methods=["OPTIONS"])
+def options():
+    return make_response("", 204)
+
+@app.route("/", methods=["POST"])
+def handle():
     try:
-        data = json.loads(req)
+        data = request.get_json()
         username = data.get("username")
         password = data.get("password")
         code2fa = data.get("code2fa")
 
         if not username or not password or not code2fa:
-            return json.dumps({ "authenticated": False, "error": "Missing fields" })
+            return jsonify({ "authenticated": False, "error": "Missing fields" })
 
         # Connexion à PostgreSQL
         conn = psycopg2.connect(
@@ -29,7 +44,7 @@ def handle(req):
         row = cur.fetchone()
 
         if not row:
-            return json.dumps({ "authenticated": False, "error": "User not found" })
+            return jsonify({ "authenticated": False, "error": "User not found" })
 
         hashed_pw, mfa_secret, gendate = row
 
@@ -37,18 +52,18 @@ def handle(req):
         if gendate < datetime.now() - timedelta(days=180):
             cur.execute("UPDATE users SET expired = TRUE WHERE username = %s", (username,))
             conn.commit()
-            return json.dumps({ "authenticated": False, "expired": True })
+            return jsonify({ "authenticated": False, "expired": True })
 
         # Vérification mot de passe
         if not bcrypt.checkpw(password.encode('utf-8'), hashed_pw.encode('utf-8')):
-            return json.dumps({ "authenticated": False, "error": "Wrong password" })
+            return jsonify({ "authenticated": False, "error": "Wrong password" })
 
         # Vérification 2FA (TOTP)
         totp = pyotp.TOTP(mfa_secret)
         if not totp.verify(code2fa):
-            return json.dumps({ "authenticated": False, "error": "Invalid 2FA code" })
+            return jsonify({ "authenticated": False, "error": "Invalid 2FA code" })
 
-        return json.dumps({ "authenticated": True })
+        return jsonify({ "authenticated": True })
 
     except Exception as e:
-        return json.dumps({ "authenticated": False, "error": str(e) })
+        return jsonify({ "authenticated": False, "error": str(e) })

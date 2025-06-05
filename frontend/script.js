@@ -1,6 +1,6 @@
 ﻿// Connexion utilisateur
 const faasUser = "admin";
-const faasPassword = "bn7swFFkjYBA"; // Mets ici le mot de passe trouvé via kubectl
+const faasPassword = "bn7swFFkjYBA"; 
 const authHeader = "Basic " + btoa(faasUser + ":" + faasPassword);
 
 document.getElementById("loginForm")?.addEventListener("submit", async function (e) {

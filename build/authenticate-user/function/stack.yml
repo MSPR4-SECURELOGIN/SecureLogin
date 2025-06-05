@@ -9,7 +9,7 @@ functions:
     handler: functions/authenticate-user
     image: mathyslison/authenticate-user:latest
     environment:
-      DB_HOST: "db"
+      DB_HOST: "postgres.openfaas.svc.cluster.local"
       DB_PORT: "5432"
       DB_USER: "admin"
       DB_PASSWORD: "admin"
