@@ -20,9 +20,12 @@ def options():
     return make_response("", 204)
 
 @app.route("/", methods=["POST"])
-def handle():
+def main_route():
+    return handle(request.get_data(as_text=True))
+
+def handle(req):
     try:
-        data = request.get_json()
+        data = json.loads(req)
         username = data.get("username")
         password = data.get("password")
         code2fa = data.get("code2fa")
