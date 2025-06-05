@@ -56,7 +56,9 @@ async function renewAccount() {
     if (result.success) {
       document.getElementById("newPassword").textContent = result.new_password;
       document.getElementById("qrCode").src = "data:image/png;base64," + result.totp_qr_base64;
-      document.getElementById("renewResult").style.display = "block";
+      const renewEl = document.getElementById("renewResult");
+      renewEl.style.display = "block";
+      renewEl.classList.add("show");
     } else {
       alert("Erreur : " + result.error);
     }
@@ -87,7 +89,9 @@ document.getElementById("createForm")?.addEventListener("submit", async function
     if (result.success) {
       document.getElementById("generatedPassword").textContent = result.password;
       document.getElementById("generatedQr").src = "data:image/png;base64," + result.totp_qr_base64;
-      document.getElementById("createResult").style.display = "block";
+      const createEl = document.getElementById("createResult");
+      createEl.style.display = "block";
+      createEl.classList.add("show");
     } else {
       alert("Erreur : " + result.error);
     }
