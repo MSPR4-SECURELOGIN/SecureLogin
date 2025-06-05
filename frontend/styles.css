@@ -19,11 +19,3 @@ body {
   }
 }
 
-.result-box {
-  opacity: 0;
-  transition: opacity 0.5s;
-}
-
-.result-box.show {
-  opacity: 1;
-}
