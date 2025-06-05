@@ -5,7 +5,7 @@ Ce projet est une preuve de concept (PoC) de gestion de comptes utilisateurs sé
 - 🔐 Mot de passe fort généré automatiquement
 - 📲 Double authentification (2FA) avec TOTP
 - ⏳ Expiration automatique au bout de 6 mois
-- 🐳 Déploiement complet via Docker Compose
+ - 🐳 Déploiement automatisé via script
 - 🌐 Frontend simple en HTML/JS + Bootstrap
 - ⚙️ Backend Serverless avec OpenFaaS + Python
 
@@ -17,14 +17,15 @@ Ce projet est une preuve de concept (PoC) de gestion de comptes utilisateurs sé
 
 ## ▶️ Démarrage rapide
 
+
 ```bash
 git clone <repo>
 cd projet
-docker compose up -d
+./start.sh
 ```
 
 - Frontend : http://localhost:8081  
-- OpenFaaS Gateway : http://localhost:8080 (admin/admin)
+- OpenFaaS Gateway : http://localhost:8080 (admin/\<mot-de-passe généré\>)
 
 ## 🧪 Tester
 
@@ -38,7 +39,7 @@ docker compose up -d
 
 - `frontend/` : index.html, script.js
 - `functions/` : create-user, authenticate-user, renew-user
-- `docker-compose.yml` : tous les services (PostgreSQL, OpenFaaS, frontend)
+- `docker-compose.yml` : conteneur du frontend
 - `init_cof_userdb.sql` : script de création de la table `users`
 
 ## 🛠️ Technologies
