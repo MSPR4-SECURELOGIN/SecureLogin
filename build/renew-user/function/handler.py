@@ -1,4 +1,4 @@
-﻿import json
+import json
 import os
 import psycopg2
 import bcrypt
@@ -9,6 +9,9 @@ import qrcode
 import base64
 from io import BytesIO
 from datetime import datetime
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
 
 def generate_password(length=24):
     chars = string.ascii_letters + string.digits + string.punctuation
@@ -20,7 +23,7 @@ def handle(req):
         username = data.get("username")
 
         if not username:
-            return json.dumps({ "success": False, "error": "Missing username" })
+            return jsonify({ "success": False, "error": "Missing username" })
 
         # Génération
         new_password = generate_password()
@@ -53,11 +56,16 @@ def handle(req):
         """, (hashed_pw, secret, datetime.now(), username))
         conn.commit()
 
-        return json.dumps({
+        return jsonify({
             "success": True,
             "new_password": new_password,
             "totp_qr_base64": qr_base64
         })
 
     except Exception as e:
-        return json.dumps({ "success": False, "error": str(e) })
+        return jsonify({ "success": False, "error": str(e) })
+
+
+@app.route("/", methods=["POST"])
+def main_route():
+    return handle(request.get_data(as_text=True))
