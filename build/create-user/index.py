@@ -1,7 +1,7 @@
 # Copyright (c) Alex Ellis 2017. All rights reserved.
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-from flask import Flask, request
+from flask import Flask, request, make_response
 from function import handler
 from waitress import serve
 import os
@@ -24,9 +24,18 @@ def fix_transfer_encoding():
     if transfer_encoding == u"chunked":
         request.environ["wsgi.input_terminated"] = True
 
-@app.route("/", defaults={"path": ""}, methods=["POST", "GET"])
-@app.route("/<path:path>", methods=["POST", "GET"])
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = os.getenv("CORS_ORIGIN", "*")
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
+    return response
+
+@app.route("/", defaults={"path": ""}, methods=["POST", "GET", "OPTIONS"])
+@app.route("/<path:path>", methods=["POST", "GET", "OPTIONS"])
 def main_route(path):
+    if request.method == "OPTIONS":
+        return make_response("", 204)
     raw_body = os.getenv("RAW_BODY", "false")
 
     as_text = True
