@@ -16,14 +16,14 @@ if (-not $namespace) {
     helm repo add openfaas https://openfaas.github.io/faas-netes/
     kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
     $PASSWORD = -join ((65..90) + (97..122) | Get-Random -Count 12 | % {[char]$_})
-    kubectl -n openfaas create secret generic basic-auth \
-        --from-literal=basic-auth-user=admin \
+    kubectl -n openfaas create secret generic basic-auth `
+        --from-literal=basic-auth-user=admin `
         --from-literal=basic-auth-password=$PASSWORD
-    helm upgrade --install openfaas openfaas/openfaas \
-        --namespace openfaas \
-        --set basic_auth=true \
-        --set functionNamespace=openfaas-fn \
-        --set serviceType=NodePort \
+    helm upgrade --install openfaas openfaas/openfaas `
+        --namespace openfaas `
+        --set basic_auth=true `
+        --set functionNamespace=openfaas-fn `
+        --set serviceType=NodePort `
         --wait
 } else {
         $enc = kubectl -n openfaas get secret basic-auth -o jsonpath='{.data.basic-auth-password}';
