@@ -1,6 +1,6 @@
-﻿// Connexion utilisateur
+// Connexion utilisateur
 const faasUser = "admin";
-const faasPassword = "bn7swFFkjYBA"; 
+const faasPassword = 'bn7swFFkjYBA'; 
 const authHeader = "Basic " + btoa(faasUser + ":" + faasPassword);
 
 document.getElementById("loginForm")?.addEventListener("submit", async function (e) {

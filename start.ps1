@@ -1,21 +1,21 @@
 # Windows PowerShell start script
 $ErrorActionPreference = 'Stop'
 
-function Check-Command($cmd) {
+function Test-Command($cmd) {
     if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) {
         Write-Error "$cmd is required but not installed."
         exit 1
     }
 }
 
-foreach ($cmd in 'docker','kubectl','helm','faas-cli') { Check-Command $cmd }
+foreach ($cmd in 'docker','kubectl','helm','faas-cli') { Test-Command $cmd }
 
 $namespace = kubectl get namespace openfaas --no-headers 2>$null
 if (-not $namespace) {
     Write-Host 'Installing OpenFaaS via helm...'
     helm repo add openfaas https://openfaas.github.io/faas-netes/
     kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
-    $PASSWORD = -join ((65..90) + (97..122) | Get-Random -Count 12 | % {[char]$_})
+    $PASSWORD = -join ((65..90) + (97..122) | Get-Random -Count 12 | ForEach-Object {[char]$_})
     kubectl -n openfaas create secret generic basic-auth `
         --from-literal=basic-auth-user=admin `
         --from-literal=basic-auth-password=$PASSWORD
@@ -43,7 +43,7 @@ Get-ChildItem -Path functions -Recurse -Filter stack.yml | ForEach-Object {
     faas-cli deploy -f $_.FullName
 }
 
-(Get-Content frontend/script.js) -replace 'const faasPassword = ".*";', "const faasPassword = \"$PASSWORD\";" | Set-Content frontend/script.js
+(Get-Content frontend/script.js) -replace 'const faasPassword = ".*";', "const faasPassword = '$($PASSWORD)';" | Set-Content frontend/script.js
 
 docker compose up -d
 
